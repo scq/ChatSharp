@@ -136,8 +136,6 @@ namespace ChatSharp
         {
             if (HasQuit) return;
 
-            Connecting = false;
-
             StartReceiving();
             // Write login info
             if (!string.IsNullOrEmpty(User.Password))
@@ -306,6 +304,7 @@ namespace ChatSharp
         public event EventHandler<EventArgs> ConnectionComplete;
         protected internal virtual void OnConnectionComplete(EventArgs e)
         {
+            Connecting = false;
             if (ConnectionComplete != null) ConnectionComplete(this, e);
         }
         public event EventHandler<SupportsEventArgs> ServerInfoRecieved;
