@@ -135,6 +135,7 @@ namespace ChatSharp
             Connecting = false;
             PingTimer.Dispose();
             Channels.Clear();
+            RequestManager.ClearQueue();
         }
 
         private void ConnectRequest_Completed(object sender, SocketAsyncEventArgs e)

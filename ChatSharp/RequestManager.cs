@@ -32,6 +32,11 @@ namespace ChatSharp
             PendingOperations.Remove(key);
             return operation;
         }
+
+        internal void ClearQueue()
+        {
+            PendingOperations.Clear();
+        }
     }
 
     public class RequestOperation
