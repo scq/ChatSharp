@@ -129,6 +129,7 @@ namespace ChatSharp
             Socket.Disconnect(false);
             Connecting = false;
             PingTimer.Dispose();
+            Channels.Clear();
         }
 
         private void ConnectRequest_Completed(object sender, SocketAsyncEventArgs e)
