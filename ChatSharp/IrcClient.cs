@@ -89,7 +89,7 @@ namespace ChatSharp
 
         public void ConnectAsync()
         {
-            if (HasQuit) return;
+            HasQuit = false;
 
             if (Socket != null && Socket.Connected) throw new InvalidOperationException("Socket is already connected to server.");
             Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -118,12 +118,17 @@ namespace ChatSharp
 
         public void Quit(string reason)
         {
-            if (!Socket.Connected || HasQuit) return;
+            if (HasQuit) return;
 
-            if (reason == null)
-                SendRawMessage("QUIT");
-            else
-                SendRawMessage("QUIT :{0}", reason);
+            HasQuit = true;
+
+            if (Socket.Connected)
+            {
+                if (reason == null)
+                    SendRawMessage("QUIT");
+                else
+                    SendRawMessage("QUIT :{0}", reason);
+            }
             if (ConnectRequest != null) Socket.CancelConnectAsync(ConnectRequest);
             Socket.Shutdown(SocketShutdown.Both);
             Socket.Disconnect(false);
