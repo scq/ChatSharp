@@ -45,7 +45,13 @@ namespace ChatSharp.Handlers
 
         public static void HandleUserListPart(IrcClient client, IrcMessage message)
         {
-            var channel = client.Channels[message.Parameters[2]];
+            IrcChannel channel;
+            try
+            {
+                channel = client.Channels[message.Parameters[2]];
+            }
+            catch (KeyNotFoundException) { return; }
+
             var users = message.Parameters[3].Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < users.Length; i++)
             {
@@ -65,7 +71,13 @@ namespace ChatSharp.Handlers
 
         public static void HandleUserListEnd(IrcClient client, IrcMessage message)
         {
-            var channel = client.Channels[message.Parameters[1]];
+            IrcChannel channel;
+            try
+            {
+                channel = client.Channels[message.Parameters[1]];
+            }
+            catch (KeyNotFoundException) { return; }
+
             client.OnChannelListRecieved(new ChannelEventArgs(channel));
             if (client.Settings.ModeOnJoin)
             {
@@ -79,8 +91,15 @@ namespace ChatSharp.Handlers
 
         public static void HandleKick(IrcClient client, IrcMessage message)
         {
-            var channel = client.Channels[message.Parameters[0]];
-            var kicked = channel.Users[message.Parameters[1]];
+            IrcChannel channel;
+            try
+            {
+                channel = client.Channels[message.Parameters[0]];
+            }
+            catch (KeyNotFoundException) { return; }
+
+            IrcUser kicked = channel.Users.Contains(message.Parameters[1]) ? channel.Users[message.Parameters[1]] : null;
+
             if (message.Parameters[1] == client.User.Nick) // We've been kicked
                 client.Channels.Remove(client.Channels[message.Parameters[0]]);
             else
@@ -93,8 +112,12 @@ namespace ChatSharp.Handlers
                         mode.Value.Remove(message.Parameters[1]);
                 }
             }
-            client.OnUserKicked(new KickEventArgs(channel, new IrcUser(message.Prefix),
-                kicked, message.Parameters[2]));
+
+            if (kicked != null)
+            {
+                client.OnUserKicked(new KickEventArgs(channel, new IrcUser(message.Prefix),
+                    kicked, message.Parameters[2]));
+            }
         }
     }
 }
